@@ -465,149 +465,159 @@ function restoreActiveSection() {
 
 
 function initMarketMap() {
-  console.log("Initializing market map...");
-  
   const mapElement = document.getElementById("marketAreaMap");
-  if (!mapElement) {
-    console.warn("Map element not found");
-    return;
-  }
+  if (!mapElement || mapElement._leaflet_id || typeof L === 'undefined') return;
 
-  // Prevent double init
-  if (mapElement._leaflet_id) {
-    console.log("Map already initialized, skipping.");
-    return;
-  }
+  // State
+  let buyerMarker = null;
+  let buyerAccCircle = null;
+  let watchId = null;
 
-  if (typeof L === 'undefined') {
-    console.error("Leaflet not loaded");
-    mapElement.innerHTML = "Map library could not be loaded.";
-    return;
-  }
+  // Map — default to Nigeria centre; will pan to buyer once geolocation resolves
+  const map = L.map("marketAreaMap", { zoomControl: true }).setView([9.082, 8.675], 6);
 
-  try {
-    // Create map with a default view (Nigeria)
-    const map = L.map("marketAreaMap").setView([9.0820, 8.6753], 6);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
 
-    // Base tile layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+  // ── Seller markers ────────────────────────────────────────
+  const sellerMarkers = [];
+  (window.sellersData || []).forEach(seller => {
+    const lat = parseFloat(seller.latitude);
+    const lng = parseFloat(seller.longitude);
+    if (isNaN(lat) || isNaN(lng)) return;
 
-    // Add seller markers with custom icon
-    if (window.sellersData && window.sellersData.length > 0) {
-        window.sellersData.forEach(seller => {
-            const lat = parseFloat(seller.latitude);
-            const lng = parseFloat(seller.longitude);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                const imgSrc = seller.profile_picture
-                    ? `../assets/uploads/profilePicture/${seller.profile_picture}`
-                    : '../assets/uploads/profilePicture/default.png';
+    const imgSrc = seller.picture
+      ? `/uploads/profilePicture/${seller.picture}`
+      : '/assets/images/default.png';
 
-                // Create a custom marker with store name above the round button
-                const sellerIcon = L.divIcon({
-                    html: `
-                        <div style="
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            width: 80px;
-                            height: 50px;
-                        ">
-                            <span style="
-                                background: white;
-                                border-radius: 15px;
-                                border: 2px solid #004494;
-                                padding: 2px 8px;
-                                font-size: 10px;
-                                font-weight: bold;
-                                color: #004494;
-                                white-space: nowrap;
-                                max-width: 70px;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-                            " title="${seller.store_name}">${seller.store_name}</span>
-                            <div style="
-                                width: 30px;
-                                height: 30px;
-                                border-radius: 50%;
-                                border: 2px solid #004494;
-                                overflow: hidden;
-                                margin-top: 2px;
-                                background: white;
-                                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-                            ">
-                                <img src="${imgSrc}" 
-                                    style="width: 100%; height: 100%; object-fit: cover;" 
-                                    alt="${seller.store_name}"
-                                    onerror="this.src='/assets/icons/default-avatar.svg'"
-                                />
-                            </div>
-                        </div>
-                    `,
-                    className: 'seller-marker',
-                    iconSize: [80, 50],      // width, height of the whole marker
-                    iconAnchor: [40, 50],     // point of the marker (bottom center)
-                    popupAnchor: [0, -50]     // popup appears above the marker
-                });
+    const icon = L.divIcon({
+      html: `<div class="mkr-seller-pin">
+               <span class="mkr-seller-label">${seller.store_name}</span>
+               <div class="mkr-seller-circle">
+                 <img src="${imgSrc}" alt="${seller.store_name}"
+                      onerror="this.src='/assets/images/default.png'">
+               </div>
+             </div>`,
+      className: '',
+      iconSize:   [84, 56],
+      iconAnchor: [42, 56],
+      popupAnchor:[0, -58],
+    });
 
-                L.marker([lat, lng], { icon: sellerIcon })
-                    .addTo(map)
-                    .bindPopup(`<b>${seller.store_name}</b><br><a href="/store/${seller.store_id}">View Store</a>`);
-            }
-        });
+    const marker = L.marker([lat, lng], { icon }).addTo(map);
+    marker.on('click', () => openSellerPanel(seller, map));
+    sellerMarkers.push(marker);
+  });
+
+  // ── Buyer live-tracking dot ───────────────────────────────
+  const buyerIcon = L.divIcon({
+    html: '<div class="mkr-buyer-dot"><div class="mkr-buyer-pulse"></div></div>',
+    className: '',
+    iconSize:   [20, 20],
+    iconAnchor: [10, 10],
+  });
+
+  function placeBuyerDot(lat, lng, accuracy) {
+    if (buyerMarker) {
+      buyerMarker.setLatLng([lat, lng]);
+      buyerAccCircle.setLatLng([lat, lng]).setRadius(accuracy);
+    } else {
+      buyerMarker = L.marker([lat, lng], { icon: buyerIcon, zIndexOffset: 1000 })
+        .addTo(map)
+        .bindPopup('📍 You are here');
+      buyerAccCircle = L.circle([lat, lng], {
+        radius: accuracy,
+        color: '#4A90E2', fillColor: '#4A90E2', fillOpacity: 0.12, weight: 1,
+      }).addTo(map);
     }
-
-    // --- Create a "Focus on me" button ---
-    const focusButton = L.control({ position: 'topleft' });
-    focusButton.onAdd = function(map) {
-      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-      div.innerHTML = `
-        <button style="background: white; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Focus on me">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-crosshair" viewBox="0 0 16 16">
-            <path d="M8.5.5a.5.5 0 0 0-1 0v.518A7 7 0 0 0 1.018 7.5H.5a.5.5 0 0 0 0 1h.518A7 7 0 0 0 7.5 14.982v.518a.5.5 0 0 0 1 0v-.518A7 7 0 0 0 14.982 8.5h.518a.5.5 0 0 0 0-1h-.518A7 7 0 0 0 8.5 1.018zm-6.48 7A6 6 0 0 1 7.5 2.02v.48a.5.5 0 0 0 1 0v-.48a6 6 0 0 1 5.48 5.48h-.48a.5.5 0 0 0 0 1h.48a6 6 0 0 1-5.48 5.48v-.48a.5.5 0 0 0-1 0v.48A6 6 0 0 1 2.02 8.5h.48a.5.5 0 0 0 0-1zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-          </svg>
-        </button>
-      `;
-      let userMarker = null;
-      div.onclick = function() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const lat = position.coords.latitude;
-              const lng = position.coords.longitude;
-              map.setView([lat, lng], 14); // zoom level 14 for street level
-              
-              // Optionally add a temporary marker
-              userMarker = L.marker([lat, lng], {
-                icon: L.icon({
-                  iconUrl: '../assets/icons/buyer.svg',
-                  iconSize: [24, 24]
-                })
-              }).addTo(map).bindPopup("You are here").openPopup();
-            },
-            (error) => {
-              alert("Unable to get your location: " + error.message);
-            }
-          );
-        } else {
-          alert("Geolocation not supported by your browser.");
-        }
-      };
-      return div;
-    };
-    focusButton.addTo(map);
-
-    // Fix map rendering after a short delay
-    setTimeout(() => map.invalidateSize(), 200);
-    console.log("Map initialized successfully");
-
-  } catch (error) {
-    console.error("Map initialization failed:", error);
-    mapElement.innerHTML = '<div class="text-center p-4">Map could not be loaded. Please check your connection.</div>';
   }
+
+  if (navigator.geolocation) {
+    // Initial snap to buyer, then fit sellers into view
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+      placeBuyerDot(lat, lng, accuracy);
+
+      if (sellerMarkers.length > 0) {
+        const group = L.featureGroup([...sellerMarkers, buyerMarker]);
+        map.fitBounds(group.getBounds(), { padding: [60, 60] });
+      } else {
+        map.setView([lat, lng], 14);
+      }
+    }, null, { enableHighAccuracy: true, timeout: 10000 });
+
+    // Continuous tracking
+    watchId = navigator.geolocation.watchPosition(pos => {
+      const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+      placeBuyerDot(lat, lng, accuracy);
+    }, null, { enableHighAccuracy: true, maximumAge: 8000 });
+  }
+
+  // ── "Go to my location" control ──────────────────────────
+  const locCtrl = L.control({ position: 'topleft' });
+  locCtrl.onAdd = () => {
+    const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+    div.innerHTML = `<button class="mkr-locate-btn" title="Go to my location">
+      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="#004494" viewBox="0 0 16 16">
+        <path d="M8.5.5a.5.5 0 0 0-1 0v.518A7 7 0 0 0 1.018 7.5H.5a.5.5 0 0 0 0 1h.518A7 7 0 0 0 7.5 14.982v.518a.5.5 0 0 0 1 0v-.518A7 7 0 0 0 14.982 8.5h.518a.5.5 0 0 0 0-1h-.518A7 7 0 0 0 8.5 1.018zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+      </svg>
+    </button>`;
+    L.DomEvent.on(div.querySelector('button'), 'click', L.DomEvent.stopPropagation);
+    div.querySelector('button').addEventListener('click', () => {
+      if (buyerMarker) {
+        map.setView(buyerMarker.getLatLng(), 16);
+        buyerMarker.openPopup();
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+        });
+      }
+    });
+    return div;
+  };
+  locCtrl.addTo(map);
+
+  // Clean up watcher when section is hidden
+  document.querySelectorAll('.header-navlink:not([href="#market"])').forEach(l => {
+    l.addEventListener('click', () => {
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+    }, { once: false });
+  });
+
+  setTimeout(() => map.invalidateSize(), 250);
+}
+
+// ── Seller info panel (right sidebar) ────────────────────────
+function openSellerPanel(seller, map) {
+  const sidebar = document.getElementById('sellerSidebar');
+  if (!sidebar) return;
+
+  const imgSrc = seller.picture
+    ? `/uploads/profilePicture/${seller.picture}`
+    : '/assets/images/default.png';
+
+  sidebar.querySelector('.market-sidebar-content').innerHTML = `
+    <div class="mkr-seller-panel">
+      <div class="mkr-panel-header">
+        <img src="${imgSrc}" alt="${seller.store_name}"
+             onerror="this.src='/assets/images/default.png'">
+        <div>
+          <h5>${seller.store_name}</h5>
+          ${seller.address ? `<p class="mkr-panel-addr">📍 ${seller.address}</p>` : ''}
+        </div>
+      </div>
+      <hr class="my-2">
+      <p class="mkr-panel-hint">Tap the store on the map to see products when the store page is ready.</p>
+      <button class="mkr-panel-locate-btn"
+              onclick="window._mkrMap && window._mkrMap.setView([${seller.latitude},${seller.longitude}], 17)">
+        📍 Centre on store
+      </button>
+    </div>`;
+
+  sidebar.classList.remove('collapsed');
+  if (map) { window._mkrMap = map; setTimeout(() => map.invalidateSize(), 320); }
 }
 
 
