@@ -277,82 +277,281 @@
 
         {{-- Profile Section --}}
         <section id="profile" class="section">
-            <div class="d-flex flex-column align-items-center justify-content-between p-4 gap-2 mb-3 profile-container">
-                <div class="d-flex align-items-center justify-content-between account px-4 w-100">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="profile">
-                            <form action="{{ route('buyer.upload.picture') }}" method="POST" enctype="multipart/form-data" id="ppForm">
-                                @csrf
-                                <label for="ppInput" style="cursor:pointer;">
-                                    <img src="{{ asset('uploads/profilePicture/' . $user->picture) }}" alt="Profile Picture" style="border:0.5px solid #0056B3;">
-                                </label>
-                                <input type="file" id="ppInput" name="picture" class="d-none" accept="image/*" onchange="document.getElementById('ppForm').submit()">
-                            </form>
+            <div class="bpro-wrap">
+
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mx-4 mt-3 py-2" role="alert" style="font-size:13px;">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+                {{-- ── Header card ─────────────────────────────── --}}
+                <div class="bpro-header-card">
+                    <div class="bpro-avatar-wrap">
+                        <form action="{{ route('buyer.upload.picture') }}" method="POST" enctype="multipart/form-data" id="ppForm">
+                            @csrf
+                            <label for="ppInput" class="bpro-avatar-label">
+                                <img src="{{ asset('uploads/profilePicture/' . $user->picture) }}"
+                                     alt="Profile" class="bpro-avatar"
+                                     onerror="this.src='{{ asset('assets/images/default.png') }}'">
+                                <div class="bpro-avatar-overlay">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#fff" viewBox="0 0 16 16">
+                                        <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                                        <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 0 2.828 4zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0"/>
+                                    </svg>
+                                </div>
+                            </label>
+                            <input type="file" id="ppInput" name="picture" class="d-none" accept="image/*"
+                                   onchange="document.getElementById('ppForm').submit()">
+                        </form>
+                    </div>
+                    <div class="bpro-header-info">
+                        <div class="bpro-fullname">
+                            {{ trim(($profile->first_name ?? '') . ' ' . ($profile->last_name ?? '')) ?: $user->username }}
                         </div>
-                        <div class="d-flex flex-column gap-1 profile">
-                            <div class="d-flex gap-1 fullname">
-                                <span>{{ $account->account_fullname ?? $user->username }}</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-md-5 status">
-                                <span>Balance</span>
-                                <button type="button" id="balanceBtn">
-                                    <img src="{{ asset('assets/icons/eye-slash-fill.svg') }}" alt="Toggle" id="balance-visibility">
-                                </button>
-                            </div>
-                            <div class="amount">
-                                <span id="currency">{{ $account->currency ?? 'NGN' }}</span>
-                                <span id="balance">{{ number_format($account->balance ?? 0, 2) }}</span>
-                            </div>
+                        <div class="bpro-username">@{{ $user->username }}</div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
+                            <span class="bpro-badge bpro-badge-role">{{ ucfirst($user->role) }}</span>
+                            <span class="bpro-badge {{ $user->status === 'active' ? 'bpro-badge-active' : 'bpro-badge-inactive' }}">
+                                {{ ucfirst($user->status) }}
+                            </span>
+                            <span class="bpro-badge bpro-badge-date">
+                                Member since {{ $user->created_at->format('M Y') }}
+                            </span>
                         </div>
                     </div>
-                    <a href="#settings" data-href="#settings">
-                        <img src="{{ asset('assets/icons/gear-fill.svg') }}" alt="Settings" id="settings-profile-btn">
-                    </a>
+                    <button class="bpro-edit-trigger" data-bs-toggle="modal" data-bs-target="#editProfileModal"
+                            title="Edit profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#004494" viewBox="0 0 16 16">
+                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="px-4 action-btn-container" style="width:80%;">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 action-btn">
-                        <button class="d-flex align-items-center gap-2 pri-btn">Deposit</button>
-                        <button class="d-flex align-items-center gap-2 pri-btn">Merketar Pay</button>
-                        <button class="d-flex align-items-center gap-2 pri-btn">Others</button>
-                        <button class="d-flex align-items-center gap-2 pri-btn">Recharge</button>
-                        <button class="d-flex align-items-center gap-2 pri-btn">Crypto</button>
+                {{-- ── Wallet card ──────────────────────────────── --}}
+                <div class="bpro-wallet-card">
+                    <div class="bpro-wallet-top">
+                        <div>
+                            <div class="bpro-wallet-label">Merketar Wallet</div>
+                            <div class="bpro-wallet-accnum">
+                                {{ $account->account_number ?? 'Not assigned' }}
+                                <span class="bpro-wallet-status {{ ($account->account_status ?? '') === 'active' ? 'ws-active' : 'ws-other' }}">
+                                    {{ ucfirst($account->account_status ?? 'inactive') }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="bpro-wallet-bal-wrap">
+                            <span class="bpro-wallet-cur">{{ $account->currency ?? 'NGN' }}</span>
+                            <span class="bpro-wallet-bal" id="balance">{{ number_format($account->balance ?? 0, 2) }}</span>
+                            <button class="bpro-bal-eye" id="balanceBtn" type="button" title="Toggle balance">
+                                <img src="{{ asset('assets/icons/eye-slash-fill.svg') }}" id="balance-visibility" width="18" alt="toggle">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bpro-wallet-actions">
+                        <button class="bpro-wact">
+                            <span class="bpro-wact-icon">⬇️</span>Deposit
+                        </button>
+                        <button class="bpro-wact">
+                            <span class="bpro-wact-icon">📤</span>Send
+                        </button>
+                        <button class="bpro-wact">
+                            <span class="bpro-wact-icon">📱</span>Recharge
+                        </button>
+                        <button class="bpro-wact">
+                            <span class="bpro-wact-icon">💳</span>Pay
+                        </button>
+                        <button class="bpro-wact">
+                            <span class="bpro-wact-icon">•••</span>More
+                        </button>
                     </div>
                 </div>
 
-                <div class="d-flex flex-column w-100 px-3 gap-3 recent-histories">
-                    <div class="history"><span>Recent Purchases</span></div>
-                    <hr style="border:1px solid #004494;">
+                {{-- ── Personal details ─────────────────────────── --}}
+                <div class="bpro-details-card">
+                    <div class="bpro-card-head">
+                        <span>Personal Details</span>
+                        <button class="bpro-edit-trigger" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit</button>
+                    </div>
+                    <div class="bpro-details-grid">
+                        <div class="bpro-detail-row">
+                            <span class="bpro-detail-lbl">Full name</span>
+                            <span class="bpro-detail-val">
+                                {{ trim(($profile->first_name ?? '') . ' ' . ($profile->middle_name ?? '') . ' ' . ($profile->last_name ?? '')) ?: '—' }}
+                            </span>
+                        </div>
+                        <div class="bpro-detail-row">
+                            <span class="bpro-detail-lbl">Email</span>
+                            <span class="bpro-detail-val">{{ $user->email }}</span>
+                        </div>
+                        <div class="bpro-detail-row">
+                            <span class="bpro-detail-lbl">Phone</span>
+                            <span class="bpro-detail-val">
+                                {{ $profile && $profile->phone_number ? ($profile->phone_code ?? '') . ' ' . $profile->phone_number : '—' }}
+                            </span>
+                        </div>
+                        <div class="bpro-detail-row">
+                            <span class="bpro-detail-lbl">Gender</span>
+                            <span class="bpro-detail-val">{{ $profile->gender ? ucfirst($profile->gender) : '—' }}</span>
+                        </div>
+                        <div class="bpro-detail-row">
+                            <span class="bpro-detail-lbl">Date of birth</span>
+                            <span class="bpro-detail-val">
+                                {{ $profile && $profile->date_of_birth ? \Carbon\Carbon::parse($profile->date_of_birth)->format('d M Y') : '—' }}
+                            </span>
+                        </div>
+                        <div class="bpro-detail-row">
+                            <span class="bpro-detail-lbl">Location</span>
+                            <span class="bpro-detail-val">
+                                {{ collect([$profile->city ?? null, $profile->state ?? null, $profile->country ?? null])->filter()->implode(', ') ?: '—' }}
+                            </span>
+                        </div>
+                        <div class="bpro-detail-row">
+                            <span class="bpro-detail-lbl">Address</span>
+                            <span class="bpro-detail-val">{{ $profile->address_line ?? '—' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ── Recent purchases ─────────────────────────── --}}
+                <div class="bpro-details-card">
+                    <div class="bpro-card-head">
+                        <span>Recent Purchases</span>
+                        <a href="#purchases" data-target="purchases" class="bpro-see-all">See all →</a>
+                    </div>
                     @forelse($recentOrders as $order)
-                    <div class="history-container">
-                        <div class="flex-grow-1">
-                            <div class="initial w-100">
-                                <div class="d-flex align-items-center gap-2 seller-profile">
-                                    <span class="purchase-fullname">{{ $order->store->store_name ?? 'Unknown Store' }}</span>
-                                </div>
-                                <div class="d-flex flex-row justify-content-around align-items-center progress-bar">
-                                    <span>Purchased</span>
-                                    <img src="{{ asset('assets/icons/arrows1.svg') }}" alt="">
-                                    <span>Processing</span>
-                                    <img src="{{ asset('assets/icons/arrows1.svg') }}" alt="">
-                                    <span>Delivered</span>
-                                </div>
-                                <div class="d-flex gap-4 d-t">
-                                    <span>{{ $order->created_at->diffForHumans() }}</span>
-                                </div>
+                    @php
+                        $stages = ['pending'=>0,'processing'=>1,'shipped'=>2,'delivered'=>3,'completed'=>3];
+                        $step   = $stages[$order->status] ?? 0;
+                    @endphp
+                    <div class="bpro-order-row">
+                        <div class="bpro-order-top">
+                            <span class="bpro-order-store">{{ $order->store->store_name ?? 'Unknown Store' }}</span>
+                            <span class="bpro-order-time">{{ $order->created_at->diffForHumans() }}</span>
+                        </div>
+                        <div class="bpro-order-track">
+                            <div class="bpro-track-step {{ $step >= 0 ? 'done' : '' }}">
+                                <div class="bpro-track-dot"></div><span>Placed</span>
+                            </div>
+                            <div class="bpro-track-line {{ $step >= 1 ? 'done' : '' }}"></div>
+                            <div class="bpro-track-step {{ $step >= 1 ? 'done' : '' }}">
+                                <div class="bpro-track-dot"></div><span>Processing</span>
+                            </div>
+                            <div class="bpro-track-line {{ $step >= 2 ? 'done' : '' }}"></div>
+                            <div class="bpro-track-step {{ $step >= 2 ? 'done' : '' }}">
+                                <div class="bpro-track-dot"></div><span>Shipped</span>
+                            </div>
+                            <div class="bpro-track-line {{ $step >= 3 ? 'done' : '' }}"></div>
+                            <div class="bpro-track-step {{ $step >= 3 ? 'done' : '' }}">
+                                <div class="bpro-track-dot"></div><span>Delivered</span>
                             </div>
                         </div>
+                        @if($order->total_amount)
+                        <div class="bpro-order-amount">₦{{ number_format($order->total_amount, 2) }}</div>
+                        @endif
                     </div>
                     @empty
-                    <span style="color:#004494;">No recent purchases...</span>
+                    <p class="text-muted text-center py-3" style="font-size:13px;">No purchases yet.</p>
                     @endforelse
                 </div>
 
-                <form action="{{ route('buyer.logout') }}" method="POST" class="mt-3">
-                    @csrf
-                    <button type="submit" class="sec-btn border-0">Logout</button>
-                </form>
+                {{-- ── Logout ───────────────────────────────────── --}}
+                <div class="bpro-logout-wrap">
+                    <form action="{{ route('buyer.logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bpro-logout-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                            </svg>
+                            Log out
+                        </button>
+                    </form>
+                </div>
+
             </div>
+
+            {{-- ── Edit Profile Modal ───────────────────────────── --}}
+            <div class="modal fade" id="editProfileModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content rounded-4">
+                        <div class="modal-header border-0 pb-0" style="background:#004494;">
+                            <h5 class="modal-title text-white">Edit Profile</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body pt-3">
+                            <form action="{{ route('buyer.profile.update') }}" method="POST" id="editProfileForm">
+                                @csrf
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <label class="form-label bpro-form-lbl">First name</label>
+                                        <input type="text" name="first_name" class="form-control"
+                                               value="{{ old('first_name', $profile->first_name ?? '') }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label bpro-form-lbl">Last name</label>
+                                        <input type="text" name="last_name" class="form-control"
+                                               value="{{ old('last_name', $profile->last_name ?? '') }}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label bpro-form-lbl">Phone number</label>
+                                        <div class="input-group">
+                                            <input type="text" name="phone_code" class="form-control" style="max-width:80px;"
+                                                   placeholder="+234" value="{{ old('phone_code', $profile->phone_code ?? '+234') }}">
+                                            <input type="text" name="phone_number" class="form-control"
+                                                   placeholder="08012345678" value="{{ old('phone_number', $profile->phone_number ?? '') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label bpro-form-lbl">Gender</label>
+                                        <select name="gender" class="form-select">
+                                            <option value="">— Select —</option>
+                                            <option value="male"   {{ ($profile->gender ?? '') === 'male'   ? 'selected' : '' }}>Male</option>
+                                            <option value="female" {{ ($profile->gender ?? '') === 'female' ? 'selected' : '' }}>Female</option>
+                                            <option value="other"  {{ ($profile->gender ?? '') === 'other'  ? 'selected' : '' }}>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label bpro-form-lbl">Date of birth</label>
+                                        <input type="date" name="date_of_birth" class="form-control"
+                                               value="{{ old('date_of_birth', optional($profile)->date_of_birth) }}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label bpro-form-lbl">Address</label>
+                                        <input type="text" name="address_line" class="form-control"
+                                               placeholder="Street address" value="{{ old('address_line', $profile->address_line ?? '') }}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label bpro-form-lbl">City</label>
+                                        <input type="text" name="city" class="form-control"
+                                               value="{{ old('city', $profile->city ?? '') }}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label bpro-form-lbl">State</label>
+                                        <input type="text" name="state" class="form-control"
+                                               value="{{ old('state', $profile->state ?? '') }}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label bpro-form-lbl">Country</label>
+                                        <input type="text" name="country" class="form-control"
+                                               value="{{ old('country', $profile->country ?? 'Nigeria') }}">
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary flex-grow-1" style="background:#004494;border:none;border-radius:10px;">
+                                        Save Changes
+                                    </button>
+                                    <button type="button" class="btn btn-light flex-grow-1 border rounded-3" data-bs-dismiss="modal">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
         {{-- Market Section --}}

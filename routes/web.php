@@ -36,6 +36,7 @@ Route::domain(config('app.buyer_domain'))->group(function () {
     Route::middleware('buyer')->name('buyer.')->group(function () {
         Route::get('/dashboard',         [BuyerController::class, 'index'])->name('dashboard');
         Route::post('/upload-picture',   [BuyerController::class, 'uploadProfilePicture'])->name('upload.picture');
+        Route::post('/update-profile',   [BuyerController::class, 'updateProfile'])->name('profile.update');
     });
 
 });
