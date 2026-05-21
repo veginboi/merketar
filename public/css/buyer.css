@@ -1,0 +1,222 @@
+*{
+    background-color: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**************************************************************************       Buyer Login Page CSS*/
+
+
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+.card-header {
+  background-color: #0056B3;
+  color: #ffffff;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  text-align: center;
+  padding: 1.5rem;
+}
+.form-control:focus {
+  border-color: #0056B3;
+      box-shadow: 0 0 0 0.2rem rgba(0,86,179,0.25);
+    }
+    .btn-primary {
+      background-color: #0056B3;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #004494;
+    }
+    .form-text a {
+      color: #0056B3;
+      text-decoration: none;
+    }
+    .form-text a:hover {
+      text-decoration: underline;
+    }
+    
+    
+    
+    
+    
+    /**************************************************************************       Buyer Signup Page CSS*/
+    
+    
+    .signup-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 450px;
+    }
+    .card-header {
+      background-color: #0056B3;
+      color: #ffffff;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      text-align: center;
+      padding: 1.5rem;
+    }
+    .form-control:focus {
+      border-color: #0056B3;
+      box-shadow: 0 0 0 0.2rem rgba(0,86,179,0.25);
+    }
+    .btn-primary {
+      background-color: #0056B3;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #004494;
+    }
+    .form-text a {
+      color: #0056B3;
+      text-decoration: none;
+    }
+    .form-text a:hover {
+      text-decoration: underline;
+    }
+
+
+
+
+
+    @media (max-width: 420px) {
+    .h-salute{
+        display: none !important;
+    }
+    .cat-name{
+        font-size: 8px !important;
+    }
+    .new-name{
+        font-size: 10px !important;
+    }
+    .ana-content{
+        overflow-y: scroll !important;
+    }
+    .section-second-layer{
+        padding: 10px !important;
+    }
+    .seller-sidebar{
+        padding: 0 !important;
+    }
+    .profile .fullname span, .amount div span, .status span{
+        font-size: 12px !important;
+    }
+    .profile .p-pic{
+        width: 30px !important;
+        height: 30px !important;
+    }
+    .profile #seller-balance-visibility, .profile .v-img{
+        width: 10px !important;
+    }
+    .status{
+        gap: 20px !important;
+    }
+    .p-content div{
+        min-width: fit-content !important;
+        min-height: fit-content !important;
+    }
+    .history span{
+        font-size: 8px !important;
+    }
+    .action-btn button .bi{
+        display: none !important;
+    }
+    .action-btn{
+        width: 100% !important;
+        justify-content: space-around !important;
+        flex-wrap: nowrap !important;
+    }
+    .action-btn-container{
+        padding: 10px !important    ;
+    }
+    .orderSlide{
+        padding: 0 !important;
+    }
+    .b-profile span{
+        font-size: 10px !important;
+    }
+    .pri-btn, .sec-btn{
+        padding: 5px 5px !important;
+        font-size: 5px !important;
+    }
+    .prevBtn, .nextBtn{
+        top: 0 !important;
+    }
+    .b-m-profile span{
+        font-size: 10px !important;
+        min-width: fit-content !important;
+        width: fit-content !important;
+    }
+    .m-m-detail span{
+        font-size: 8px !important;
+    }
+    .addCategory img {
+        width: 10px !important;
+    }
+    .sidebar-link img {
+        width: 18px !important;
+    }
+    .sidebar-link{
+        padding: 0 !important;
+    }
+    .seller-sidebar{
+        gap: 0 !important;
+    }
+    .s-logo{
+        width: 85px !important;
+        height: auto !important;
+    }
+    .h-profile a img{
+        width: 30px !important;
+    }
+    .seller-header{
+        padding: 10px !important;
+    }
+    .seller-header div{
+        align-self: center ;
+        height: 100%;
+    }
+    .seller-header div div div{
+        height: fit-content !important;
+    }
+    .action-btn button  {
+        font-size: 8px !important;
+    }
+    .recent-histories{
+        padding: 10px !important;
+    }
+    .account{
+      padding: 0 10px !important;
+    }
+}
