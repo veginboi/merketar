@@ -967,36 +967,107 @@
 
         {{-- FAQ Section --}}
         <section id="faq" class="section">
-            <div class="p-5 d-flex flex-column gap-4 faq-container-list">
-                @php
-                $faqs = [
-                    ['q' => 'How do I find sellers near me?', 'a' => 'Merketar uses a digital map showing approved sellers around your location. Verified sellers appear as icons — click one to view their categories and products.'],
-                    ['q' => 'Can I trust the sellers on the platform?', 'a' => 'Yes. Every seller goes through registration and approval before appearing on the map. Buyer Protection policies also ensure your transactions are safe.'],
-                    ['q' => 'How do I add products to my cart?', 'a' => 'Click a seller → select a category → choose a product → click "Add to Cart." You can review, edit, or remove items from the cart anytime.'],
-                    ['q' => 'Can I buy from multiple sellers at once?', 'a' => 'Yes. Your cart is divided by seller sections, and you can checkout with one seller or all sellers together.'],
-                    ['q' => 'How do I track my orders?', 'a' => 'Check your Purchase History to see seller name, amount, date, and order status: Paid → Processing → Delivered.'],
-                    ['q' => 'What if I don\'t receive my item?', 'a' => 'If your order isn\'t delivered within the expected time, you can open a dispute and request a refund through Buyer Protection.'],
-                    ['q' => 'How do I access my account settings?', 'a' => 'Go to your Profile section and click the gear icon.'],
-                ];
-                @endphp
-                @foreach($faqs as $i => $faq)
-                <div class="main-faq align-items-center justify-content-center w-100">
-                    <input type="checkbox" name="Dropdown" id="faq-toggle{{ $i }}">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="num">{{ $i + 1 }}.</span>
-                            <span class="question">{{ $faq['q'] }}</span>
-                        </div>
-                        <label for="faq-toggle{{ $i }}" style="border:none;"><img src="{{ asset('assets/icons/Expand.svg') }}" alt="expand"></label>
-                    </div>
-                    <div class="main-dd">
-                        <div class="d-flex gap-2">
-                            <span class="answer-placeholder">Answer:</span>
-                            <span class="answer">{{ $faq['a'] }}</span>
-                        </div>
+            <div class="faq-wrap">
+
+                {{-- ── Hero ───────────────────────────────────── --}}
+                <div class="faq-hero">
+                    <h2 class="faq-hero-title">Frequently Asked Questions</h2>
+                    <p class="faq-hero-sub">Find quick answers below, or contact support if you need more help.</p>
+                    <div class="faq-search-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgba(255,255,255,.7)" viewBox="0 0 16 16" class="faq-search-icon">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11"/>
+                        </svg>
+                        <input type="text" id="faqSearch" class="faq-search" placeholder="Search questions…">
                     </div>
                 </div>
+
+                {{-- ── Category tabs ───────────────────────────── --}}
+                @php
+                $faqData = [
+                    'Shopping' => [
+                        ['q' => 'How do I find sellers near me?',          'a' => 'Open the Market section — Merketar shows you a live map with round pins for every active seller. Your blue dot tracks your real position, so nearby sellers are easy to spot. Tap any pin to see the store name and address.'],
+                        ['q' => 'How do I add products to my cart?',        'a' => 'Tap a seller pin on the map → browse their categories → pick a product → press "Add to Cart." Your cart stays open in the left sidebar so you can keep shopping.'],
+                        ['q' => 'Can I buy from multiple sellers at once?',  'a' => 'Yes. Your cart groups items by seller. You can checkout with one seller at a time or place all orders together in a single session.'],
+                        ['q' => 'What categories are on Merketar?',         'a' => 'Sellers list their own categories — common ones include Fresh Food, Fashion, Electronics, Home & Living, Health & Beauty, Auto Parts, and more. Use the category pills on the Home screen to filter quickly.'],
+                    ],
+                    'Payments' => [
+                        ['q' => 'What payment methods are accepted?',       'a' => 'Merketar supports bank transfer, card payment, and Merketar Wallet balance. More options like Merketar Pay and crypto are coming soon.'],
+                        ['q' => 'Is my payment information secure?',        'a' => 'Yes. All transactions are processed over encrypted connections. Card details are never stored on our servers — they are handled by our certified payment partners.'],
+                        ['q' => 'How does the Merketar Wallet work?',       'a' => 'Your wallet holds your Merketar balance. You can deposit funds, use your balance to pay for orders, or receive refunds directly into it. Check your balance in the Profile section.'],
+                        ['q' => 'When will I be charged for an order?',     'a' => 'Payment is collected when you confirm your order at checkout. If a seller cancels or disputes arise, refunds are returned to your wallet.'],
+                    ],
+                    'Orders' => [
+                        ['q' => 'How do I track my orders?',                'a' => 'Go to the Purchases section. Each order shows a 4-step progress bar: Placed → Paid → Processing → Delivered. The active step is highlighted in blue.'],
+                        ['q' => 'What if I don\'t receive my item?',        'a' => 'If your order shows "Delivered" but you haven\'t received it, open a dispute from the Purchases section within 7 days. Our team will review the case within 24 hours.'],
+                        ['q' => 'How do I confirm delivery?',               'a' => 'Once you physically receive your order, tap "Confirm Delivery" on the order card. This releases payment to the seller and marks the order as Completed.'],
+                        ['q' => 'Can I cancel an order?',                   'a' => 'You can request a cancellation while the order is still Pending or Paid. Contact the seller directly via the Purchases section. Once an order is Processing it cannot be cancelled — open a dispute instead.'],
+                    ],
+                    'Account' => [
+                        ['q' => 'How do I update my profile?',              'a' => 'Go to Profile → tap the Edit button (pencil icon). You can update your name, phone, gender, date of birth, and address. Your profile photo can be changed by tapping your avatar.'],
+                        ['q' => 'How do I change my password?',             'a' => 'Currently password changes are handled through the login page\'s "Forgot Password" flow. A dedicated in-app password change is coming soon.'],
+                        ['q' => 'Can I have multiple Merketar accounts?',   'a' => 'Each email address can only be linked to one account. If you need a seller account as well, you must register separately with a different email.'],
+                        ['q' => 'How do I delete my account?',              'a' => 'Contact support at support@merketar.com with the subject "Account Deletion." We will process your request within 5 business days and confirm by email.'],
+                    ],
+                    'Sellers' => [
+                        ['q' => 'Can I trust the sellers on Merketar?',     'a' => 'Every seller goes through identity verification before their store is activated. Stores that receive too many disputes or bad reviews are suspended automatically.'],
+                        ['q' => 'How do sellers get verified?',             'a' => 'Sellers register with a valid phone number and email, submit their store details, and are reviewed by the Merketar admin team before appearing on the map.'],
+                        ['q' => 'How do I report a seller?',                'a' => 'Open a dispute on any order from that seller in the Purchases section, or email us at support@merketar.com with the seller\'s store name and a description of the issue.'],
+                        ['q' => 'What if a seller sends the wrong item?',   'a' => 'Do not confirm delivery. Instead, open a dispute from the order card in Purchases, describe the problem, and our team will mediate a resolution.'],
+                    ],
+                    'General' => [
+                        ['q' => 'Is Merketar available outside Nigeria?',   'a' => 'Merketar is currently focused on the Nigerian market. International expansion is planned — follow our social channels for announcements.'],
+                        ['q' => 'How do I invite friends and earn?',        'a' => 'The referral programme is coming soon. You will earn wallet credit for every friend who signs up and completes their first purchase using your invite link.'],
+                        ['q' => 'How do I contact Merketar support?',       'a' => 'Use the Contact section in this dashboard, email support@merketar.com, or WhatsApp us on +234 800 000 0000. We respond within 24 hours on business days.'],
+                        ['q' => 'Where can I read the Terms & Privacy Policy?', 'a' => 'Full legal documents are available at merketar.com/terms and merketar.com/privacy. They are also linked in the app footer.'],
+                    ],
+                ];
+                $allCategories = array_keys($faqData);
+                @endphp
+
+                <div class="faq-tabs" id="faqTabs">
+                    <button class="faq-tab active" data-cat="all">All</button>
+                    @foreach($allCategories as $cat)
+                    <button class="faq-tab" data-cat="{{ $cat }}">{{ $cat }}</button>
+                    @endforeach
+                </div>
+
+                {{-- ── Accordion list ──────────────────────────── --}}
+                <div class="faq-list" id="faqList">
+                @php $fi = 0; @endphp
+                @foreach($faqData as $cat => $items)
+                    @foreach($items as $faq)
+                    <div class="faq-item" data-cat="{{ $cat }}" data-search="{{ strtolower($faq['q']) }} {{ strtolower($faq['a']) }}">
+                        <button class="faq-q" data-idx="{{ $fi }}">
+                            <span>{{ $faq['q'] }}</span>
+                            <svg class="faq-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+                            </svg>
+                        </button>
+                        <div class="faq-a" id="faq-a-{{ $fi }}">
+                            <p>{{ $faq['a'] }}</p>
+                        </div>
+                    </div>
+                    @php $fi++; @endphp
+                    @endforeach
                 @endforeach
+
+                    <div class="faq-no-results d-none" id="faqNoResults">
+                        <div style="font-size:40px;margin-bottom:10px;">🔍</div>
+                        <strong>No results found</strong>
+                        <p>Try different keywords or browse by category above.</p>
+                    </div>
+                </div>
+
+                {{-- ── Still need help CTA ─────────────────────── --}}
+                <div class="faq-cta">
+                    <div class="faq-cta-icon">💬</div>
+                    <div>
+                        <strong>Still have questions?</strong>
+                        <p>Our support team is happy to help with anything not covered here.</p>
+                    </div>
+                    <a href="#contact" data-target="contact" class="faq-cta-btn">Contact Support</a>
+                </div>
+
             </div>
         </section>
 
@@ -1109,6 +1180,49 @@ document.querySelectorAll('.purch-expand-btn').forEach(btn => {
         btn.classList.toggle('open', !isOpen);
     });
 });
+
+// ── FAQ: accordion ───────────────────────────────────────────
+document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const item   = btn.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        // close all
+        document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+    });
+});
+
+// ── FAQ: category tabs ────────────────────────────────────────
+document.querySelectorAll('.faq-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.faq-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        filterFaqs();
+    });
+});
+
+// ── FAQ: search ───────────────────────────────────────────────
+const faqSearch = document.getElementById('faqSearch');
+if (faqSearch) faqSearch.addEventListener('input', filterFaqs);
+
+function filterFaqs() {
+    const activeTab = document.querySelector('.faq-tab.active');
+    const cat       = activeTab ? activeTab.dataset.cat : 'all';
+    const q         = (faqSearch ? faqSearch.value.toLowerCase().trim() : '');
+    const items     = document.querySelectorAll('.faq-item');
+    let   visible   = 0;
+
+    items.forEach(item => {
+        const catMatch    = cat === 'all' || item.dataset.cat === cat;
+        const searchMatch = !q || item.dataset.search.includes(q);
+        const show = catMatch && searchMatch;
+        item.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    const noRes = document.getElementById('faqNoResults');
+    if (noRes) noRes.classList.toggle('d-none', visible > 0);
+}
 
 // ── Contact: quick-help chips → pre-fill subject ──────────────
 document.querySelectorAll('.ctc-chip').forEach(chip => {
