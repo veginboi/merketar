@@ -599,34 +599,212 @@
 
         {{-- Purchases Section --}}
         <section id="purchases" class="section">
-            <div class="d-flex flex-column px-5 py-4 mb-3 gap-3 history-contain">
-                <div class="history"><span>Purchase History</span></div>
-                <hr style="border:1px solid #004494;">
+            <div class="purch-wrap">
+
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-0 py-2" role="alert" style="font-size:13px;border-radius:0;">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+                {{-- ── Header + stats ──────────────────────────── --}}
+                <div class="purch-header">
+                    <div>
+                        <h4 class="purch-title">Purchase History</h4>
+                        <p class="purch-sub">{{ $allOrders->count() }} order{{ $allOrders->count() !== 1 ? 's' : '' }}
+                            · ₦{{ number_format($allOrders->sum('total_amount'), 2) }} total spent</p>
+                    </div>
+                    <div class="purch-search-wrap">
+                        <input type="text" id="purchSearch" placeholder="Search store or order ID…" class="purch-search">
+                    </div>
+                </div>
+
+                {{-- ── Status tabs ─────────────────────────────── --}}
+                <div class="purch-tabs" id="purchTabs">
+                    <button class="purch-tab active" data-filter="all">All</button>
+                    <button class="purch-tab" data-filter="pending">Pending</button>
+                    <button class="purch-tab" data-filter="processing">Processing</button>
+                    <button class="purch-tab" data-filter="delivered">Delivered</button>
+                    <button class="purch-tab" data-filter="completed">Completed</button>
+                    <button class="purch-tab" data-filter="disputed">Disputes</button>
+                    <button class="purch-tab" data-filter="refunded">Refunded</button>
+                </div>
+
+                {{-- ── Order list ───────────────────────────────── --}}
+                <div class="purch-list" id="purchList">
+
                 @forelse($allOrders as $order)
-                <div class="history-container">
-                    <div class="flex-grow-1">
-                        <div class="initial w-100">
-                            <div class="d-flex align-items-center gap-2 seller-profile">
-                                <span class="purchase-fullname">{{ $order->store->store_name ?? 'Unknown' }}</span>
+                @php
+                    $statusStep = match($order->status) {
+                        'pending'    => 0,
+                        'paid'       => 1,
+                        'processing' => 2,
+                        'delivered','completed' => 3,
+                        default      => 0,
+                    };
+                    $statusColor = match($order->status) {
+                        'pending'    => 'purch-s-pending',
+                        'paid'       => 'purch-s-paid',
+                        'processing' => 'purch-s-processing',
+                        'delivered'  => 'purch-s-delivered',
+                        'completed'  => 'purch-s-completed',
+                        'disputed'   => 'purch-s-disputed',
+                        'refunded'   => 'purch-s-refunded',
+                        default      => 'purch-s-pending',
+                    };
+                    $itemNames = $order->items->take(2)->map(fn($i) => $i->product->name ?? 'Item')->implode(', ');
+                    $extra     = $order->items->count() > 2 ? ' +' . ($order->items->count() - 2) . ' more' : '';
+                @endphp
+
+                <div class="purch-card" data-status="{{ $order->status }}" data-search="{{ strtolower($order->store->store_name ?? '') }} {{ strtolower($order->transaction_id) }}">
+
+                    {{-- Card header --}}
+                    <div class="purch-card-head">
+                        <div class="purch-store-info">
+                            <div class="purch-store-avatar">
+                                {{ strtoupper(substr($order->store->store_name ?? 'S', 0, 1)) }}
                             </div>
-                            <div class="d-flex flex-row justify-content-around align-items-center progress-bar">
-                                <span>Purchased</span>
-                                <img src="{{ asset('assets/icons/arrows1.svg') }}" alt="">
-                                <span>Processing</span>
-                                <img src="{{ asset('assets/icons/arrows1.svg') }}" alt="">
-                                <span>Delivered</span>
+                            <div>
+                                <div class="purch-store-name">{{ $order->store->store_name ?? 'Unknown Store' }}</div>
+                                <div class="purch-txn-id">#{{ $order->transaction_id }}</div>
                             </div>
-                            <div class="d-flex gap-2 d-t">
-                                <span>{{ $order->created_at->format('d/m/y') }}</span>
-                                <span>{{ $order->created_at->format('g:ia') }}</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-end gap-1">
+                            <span class="purch-status-badge {{ $statusColor }}">{{ ucfirst($order->status) }}</span>
+                            <span class="purch-date">{{ $order->created_at->format('d M Y, g:ia') }}</span>
+                        </div>
+                    </div>
+
+                    {{-- Items preview --}}
+                    <div class="purch-items-preview">
+                        {{ $itemNames }}{{ $extra }}
+                    </div>
+
+                    {{-- Progress tracker --}}
+                    @if(!in_array($order->status, ['disputed','refunded']))
+                    <div class="purch-tracker">
+                        @foreach(['Placed','Paid','Processing','Delivered'] as $si => $sl)
+                        <div class="purch-track-step {{ $statusStep >= $si ? 'done' : '' }}">
+                            <div class="purch-track-dot"></div>
+                            <span>{{ $sl }}</span>
+                        </div>
+                        @if($si < 3)
+                        <div class="purch-track-line {{ $statusStep > $si ? 'done' : '' }}"></div>
+                        @endif
+                        @endforeach
+                    </div>
+                    @elseif($order->status === 'disputed')
+                    <div class="purch-dispute-banner">
+                        ⚠️ Dispute open — our team is reviewing this order.
+                        @if($order->dispute_reason)
+                        <span class="purch-dispute-reason">"{{ Str::limit($order->dispute_reason, 80) }}"</span>
+                        @endif
+                    </div>
+                    @else
+                    <div class="purch-refund-banner">↩️ This order has been refunded.</div>
+                    @endif
+
+                    {{-- Footer: total + expand --}}
+                    <div class="purch-card-foot">
+                        <span class="purch-total">₦{{ number_format($order->total_amount, 2) }}</span>
+                        <button class="purch-expand-btn" data-order="{{ $order->id }}">
+                            Details <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16" class="purch-chevron">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Expandable details --}}
+                    <div class="purch-details" id="purch-details-{{ $order->id }}">
+                        <div class="purch-items-list">
+                            @foreach($order->items as $item)
+                            <div class="purch-item-row">
+                                <span class="purch-item-name">{{ $item->product->name ?? 'Product' }}</span>
+                                <span class="purch-item-qty">× {{ $item->quantity }}</span>
+                                <span class="purch-item-price">₦{{ number_format($item->unit_price, 2) }}</span>
+                                <span class="purch-item-sub">= ₦{{ number_format($item->unit_price * $item->quantity, 2) }}</span>
+                            </div>
+                            @endforeach
+                            <div class="purch-items-total">
+                                <span>Order total</span>
+                                <span>₦{{ number_format($order->total_amount, 2) }}</span>
+                            </div>
+                        </div>
+
+                        {{-- Action buttons --}}
+                        <div class="purch-actions">
+                            @if($order->status === 'delivered' && !$order->buyer_confirmed)
+                            <form action="{{ route('buyer.order.confirm') }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                <button type="submit" class="purch-action-btn purch-action-confirm">
+                                    ✅ Confirm Delivery
+                                </button>
+                            </form>
+                            @endif
+
+                            @if(in_array($order->status, ['delivered','completed']) && $order->status !== 'disputed')
+                            <button class="purch-action-btn purch-action-dispute"
+                                    data-bs-toggle="modal" data-bs-target="#disputeModal{{ $order->id }}">
+                                ⚠️ Open Dispute
+                            </button>
+                            @endif
+
+                            <button class="purch-action-btn purch-action-contact">
+                                💬 Contact Seller
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- Dispute modal for this order --}}
+                @if(in_array($order->status, ['delivered','completed']))
+                <div class="modal fade" id="disputeModal{{ $order->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4">
+                            <div class="modal-header border-0" style="background:#c0392b;">
+                                <h5 class="modal-title text-white">Open Dispute — #{{ $order->transaction_id }}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ route('buyer.order.dispute') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                    <label class="form-label fw-semibold" style="font-size:13px;">Describe the issue</label>
+                                    <textarea name="reason" class="form-control" rows="4"
+                                              placeholder="e.g. Item not received, wrong product sent…"
+                                              required style="font-size:13px;"></textarea>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <button type="submit" class="btn btn-danger flex-grow-1 rounded-3">Submit Dispute</button>
+                                        <button type="button" class="btn btn-light flex-grow-1 border rounded-3" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
+                @endif
+
                 @empty
-                <span style="color:#004494;">No purchases yet.</span>
+                <div class="purch-empty">
+                    <div class="purch-empty-icon">🛍️</div>
+                    <div class="purch-empty-title">No purchases yet</div>
+                    <p class="purch-empty-sub">When you buy from a seller on the map, your orders will appear here.</p>
+                    <a href="#market" data-target="market" class="purch-empty-btn">Browse Sellers</a>
+                </div>
                 @endforelse
-            </div>
+
+                <div class="purch-no-results d-none" id="purchNoResults">
+                    <div class="purch-empty-icon">🔍</div>
+                    <div class="purch-empty-title">No orders match</div>
+                    <p class="purch-empty-sub">Try a different filter or search term.</p>
+                </div>
+
+                </div>{{-- /purch-list --}}
+            </div>{{-- /purch-wrap --}}
+
         </section>
 
         {{-- Contact Section --}}
@@ -755,6 +933,50 @@ document.querySelectorAll('.home-product-btn[data-target]').forEach(btn => {
         document.querySelectorAll('.section.active').forEach(s => s.classList.remove('active'));
         target.classList.add('active');
         sessionStorage.setItem('activeSection', targetId);
+    });
+});
+
+// ── Purchases: tab filter ─────────────────────────────────────
+document.querySelectorAll('.purch-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.purch-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        filterPurchases();
+    });
+});
+
+// ── Purchases: search filter ──────────────────────────────────
+const purchSearch = document.getElementById('purchSearch');
+if (purchSearch) purchSearch.addEventListener('input', filterPurchases);
+
+function filterPurchases() {
+    const activeTab   = document.querySelector('.purch-tab.active');
+    const filter      = activeTab ? activeTab.dataset.filter : 'all';
+    const query       = (purchSearch ? purchSearch.value.toLowerCase().trim() : '');
+    const cards       = document.querySelectorAll('.purch-card');
+    let   visible     = 0;
+
+    cards.forEach(card => {
+        const statusMatch = filter === 'all' || card.dataset.status === filter;
+        const searchMatch = !query || card.dataset.search.includes(query);
+        const show = statusMatch && searchMatch;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    const noResults = document.getElementById('purchNoResults');
+    if (noResults) noResults.classList.toggle('d-none', visible > 0 || document.querySelectorAll('.purch-empty').length > 0);
+}
+
+// ── Purchases: expand/collapse card details ───────────────────
+document.querySelectorAll('.purch-expand-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const id      = btn.dataset.order;
+        const panel   = document.getElementById('purch-details-' + id);
+        if (!panel) return;
+        const isOpen  = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        btn.classList.toggle('open', !isOpen);
     });
 });
 </script>

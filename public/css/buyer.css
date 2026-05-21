@@ -1128,3 +1128,349 @@
   .market-sidebar { width: 240px; min-width: 240px; }
   #marketAreaMap  { min-height: 300px; }
 }
+
+
+/* ================================================================
+   PURCHASES SECTION
+   ================================================================ */
+
+#purchases { overflow-y: auto; }
+
+.purch-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.purch-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 20px 0;
+  flex-wrap: wrap;
+}
+
+.purch-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #004494;
+  margin: 0 0 2px;
+}
+
+.purch-sub { font-size: 12px; color: #6c757d; margin: 0; }
+
+.purch-search-wrap { flex-shrink: 0; }
+
+.purch-search {
+  border: 1.5px solid #d0ddf0;
+  border-radius: 24px;
+  padding: 7px 16px;
+  font-size: 13px;
+  outline: none;
+  width: 220px;
+  transition: border-color .18s;
+}
+
+.purch-search:focus { border-color: #004494; }
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+.purch-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 14px 20px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.purch-tabs::-webkit-scrollbar { display: none; }
+
+.purch-tab {
+  border: 1.5px solid #d0ddf0;
+  background: #fff;
+  color: #555;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  flex-shrink: 0;
+}
+
+.purch-tab:hover  { border-color: #004494; color: #004494; }
+.purch-tab.active { background: #004494; border-color: #004494; color: #fff; }
+
+/* ── Order list ─────────────────────────────────────────────── */
+.purch-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Order card ─────────────────────────────────────────────── */
+.purch-card {
+  background: #fff;
+  border: 1.5px solid #e4eaf3;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,68,148,.05);
+  transition: box-shadow .18s;
+}
+
+.purch-card:hover { box-shadow: 0 4px 16px rgba(0,68,148,.1); }
+
+.purch-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+}
+
+.purch-store-info  { display: flex; align-items: center; gap: 10px; }
+
+.purch-store-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #004494;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.purch-store-name { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+.purch-txn-id     { font-size: 11px; color: #6c757d; margin-top: 1px; font-family: monospace; }
+.purch-date       { font-size: 10px; color: #6c757d; }
+
+/* Status badges */
+.purch-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+.purch-s-pending    { background: #f0f0f0;  color: #666; }
+.purch-s-paid       { background: #dbeafe;  color: #1d4ed8; }
+.purch-s-processing { background: #fef3c7;  color: #92400e; }
+.purch-s-delivered  { background: #d1fae5;  color: #065f46; }
+.purch-s-completed  { background: #d1fae5;  color: #065f46; }
+.purch-s-disputed   { background: #fee2e2;  color: #991b1b; }
+.purch-s-refunded   { background: #f3f4f6;  color: #6b7280; }
+
+/* Items preview line */
+.purch-items-preview {
+  font-size: 12px;
+  color: #6c757d;
+  padding: 0 16px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Progress tracker */
+.purch-tracker {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px 10px;
+}
+
+.purch-track-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.purch-track-step span { font-size: 9px; color: #aaa; white-space: nowrap; }
+.purch-track-step.done span { color: #004494; font-weight: 600; }
+
+.purch-track-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  background: #fff;
+}
+
+.purch-track-step.done .purch-track-dot { border-color: #004494; background: #004494; }
+
+.purch-track-line { flex: 1; height: 2px; background: #e8e8e8; margin-bottom: 13px; }
+.purch-track-line.done { background: #004494; }
+
+/* Dispute / refund banners */
+.purch-dispute-banner {
+  margin: 4px 16px 10px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #92400e;
+}
+
+.purch-dispute-reason {
+  display: block;
+  margin-top: 4px;
+  font-style: italic;
+  opacity: .8;
+}
+
+.purch-refund-banner {
+  margin: 4px 16px 10px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Card footer */
+.purch-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 12px;
+  border-top: 1px solid #f0f4fb;
+}
+
+.purch-total { font-size: 15px; font-weight: 800; color: #004494; }
+
+.purch-expand-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1.5px solid #d0ddf0;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #004494;
+  cursor: pointer;
+  transition: background .18s;
+}
+
+.purch-expand-btn:hover { background: #e8f0fb; }
+
+.purch-chevron {
+  transition: transform .25s;
+}
+
+.purch-expand-btn.open .purch-chevron { transform: rotate(180deg); }
+
+/* Expandable details panel */
+.purch-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+  border-top: 1px solid #f0f4fb;
+}
+
+.purch-details.open { max-height: 600px; }
+
+.purch-items-list {
+  padding: 12px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.purch-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #e8edf5;
+}
+
+.purch-item-row:last-of-type { border-bottom: none; }
+
+.purch-item-name  { flex: 1; color: #1a1a2e; font-weight: 500; }
+.purch-item-qty   { color: #6c757d; flex-shrink: 0; }
+.purch-item-price { color: #6c757d; flex-shrink: 0; font-size: 12px; }
+.purch-item-sub   { font-weight: 700; color: #004494; flex-shrink: 0; min-width: 80px; text-align: right; }
+
+.purch-items-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: #004494;
+  padding: 8px 0 4px;
+  border-top: 2px solid #e4eaf3;
+}
+
+/* Action buttons */
+.purch-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px 14px;
+  flex-wrap: wrap;
+}
+
+.purch-action-btn {
+  border: none;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .18s;
+}
+
+.purch-action-btn:hover { opacity: .85; }
+.purch-action-confirm { background: #d1fae5; color: #065f46; }
+.purch-action-dispute { background: #fee2e2; color: #991b1b; }
+.purch-action-contact { background: #e8f0fb; color: #004494; }
+
+/* ── Empty states ───────────────────────────────────────────── */
+.purch-empty, .purch-no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.purch-empty-icon  { font-size: 48px; margin-bottom: 12px; }
+.purch-empty-title { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+.purch-empty-sub   { font-size: 13px; color: #6c757d; max-width: 280px; margin-bottom: 16px; }
+
+.purch-empty-btn {
+  background: #004494;
+  color: #fff;
+  border-radius: 24px;
+  padding: 9px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .18s;
+}
+
+.purch-empty-btn:hover { background: #003070; color: #fff; }
+
+@media (max-width: 576px) {
+  .purch-header { flex-direction: column; gap: 8px; }
+  .purch-search { width: 100%; }
+  .purch-item-row { flex-wrap: wrap; }
+  .purch-item-sub { min-width: auto; }
+}

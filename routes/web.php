@@ -37,6 +37,8 @@ Route::domain(config('app.buyer_domain'))->group(function () {
         Route::get('/dashboard',         [BuyerController::class, 'index'])->name('dashboard');
         Route::post('/upload-picture',   [BuyerController::class, 'uploadProfilePicture'])->name('upload.picture');
         Route::post('/update-profile',   [BuyerController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/order/confirm',    [BuyerController::class, 'confirmDelivery'])->name('order.confirm');
+        Route::post('/order/dispute',    [BuyerController::class, 'openDispute'])->name('order.dispute');
     });
 
 });

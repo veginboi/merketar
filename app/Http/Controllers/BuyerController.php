@@ -53,6 +53,39 @@ class BuyerController extends Controller
         return view('buyer.index', compact('user', 'profile', 'account', 'sellers', 'trendingProducts', 'recentOrders', 'allOrders'));
     }
 
+    public function confirmDelivery(Request $request)
+    {
+        $order = Order::where('id', $request->input('order_id'))
+            ->where('buyer_id', Auth::id())
+            ->whereIn('status', ['delivered'])
+            ->firstOrFail();
+
+        $order->update([
+            'status'           => 'completed',
+            'buyer_confirmed'  => true,
+            'confirmed_at'     => now(),
+        ]);
+
+        return back()->with('success', 'Delivery confirmed. Thank you!');
+    }
+
+    public function openDispute(Request $request)
+    {
+        $request->validate(['reason' => 'required|string|max:500']);
+
+        $order = Order::where('id', $request->input('order_id'))
+            ->where('buyer_id', Auth::id())
+            ->whereIn('status', ['delivered', 'completed'])
+            ->firstOrFail();
+
+        $order->update([
+            'status'         => 'disputed',
+            'dispute_reason' => $request->input('reason'),
+        ]);
+
+        return back()->with('success', 'Dispute opened. Our team will review within 24 hours.');
+    }
+
     public function updateProfile(Request $request)
     {
         $request->validate([
