@@ -1073,14 +1073,176 @@
 
         {{-- More Section --}}
         <section id="more" class="section">
-            <div class="more-container d-flex flex-column gap-2 px-5 py-4">
-                <div class="more-sublink-container py-4">
-                    <div class="d-flex flex-wrap gap-4 justify-content-center more-sublink px-3">
-                        @foreach(['Deals','Wishlist','Notification','Cart','Blog','Community','About Us','Help Center','Invite & Earn','Gift Cards','Best Sellers','New Arrivals','Saved Searches','Events & Promotions','Settings','Purchase History'] as $link)
-                        <button class="border-0"><a class="pri-btn more-btn">{{ $link }}</a></button>
-                        @endforeach
+            <div class="more-wrap">
+
+                {{-- ── User identity card ──────────────────────── --}}
+                <div class="more-user-card">
+                    <img src="{{ asset('uploads/profilePicture/' . $user->picture) }}"
+                         alt="avatar" class="more-user-avatar"
+                         onerror="this.src='{{ asset('assets/images/default.png') }}'">
+                    <div class="more-user-info">
+                        <div class="more-user-name">
+                            {{ trim(($profile->first_name ?? '') . ' ' . ($profile->last_name ?? '')) ?: $user->username }}
+                        </div>
+                        <div class="more-user-email">{{ $user->email }}</div>
+                        <div class="more-user-bal">
+                            Wallet: <strong>{{ $account->currency ?? 'NGN' }} {{ number_format($account->balance ?? 0, 2) }}</strong>
+                        </div>
                     </div>
+                    <a href="#profile" data-target="profile" class="more-edit-btn" title="Edit profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                        </svg>
+                    </a>
                 </div>
+
+                {{-- ── Quick-nav row ────────────────────────────── --}}
+                <div class="more-quicknav">
+                    @foreach([
+                        ['icon'=>'🛒','label'=>'Cart',      'target'=>'market'],
+                        ['icon'=>'🛍️','label'=>'Orders',    'target'=>'purchases'],
+                        ['icon'=>'🗺️','label'=>'Map',       'target'=>'market'],
+                        ['icon'=>'❤️','label'=>'Wishlist',  'target'=>'more'],
+                        ['icon'=>'🔔','label'=>'Alerts',    'target'=>'more'],
+                    ] as $q)
+                    <a href="#{{ $q['target'] }}" data-target="{{ $q['target'] }}" class="more-qnav-item">
+                        <div class="more-qnav-icon">{{ $q['icon'] }}</div>
+                        <span>{{ $q['label'] }}</span>
+                    </a>
+                    @endforeach
+                </div>
+
+                <div class="more-sections">
+
+                    {{-- ── My Shopping ─────────────────────────── --}}
+                    <div class="more-group">
+                        <div class="more-group-title">My Shopping</div>
+                        <div class="more-grid">
+                            @foreach([
+                                ['icon'=>'🏷️', 'label'=>'Deals & Offers',   'desc'=>'Flash sales and exclusive discounts',   'target'=>'home',      'soon'=>false],
+                                ['icon'=>'❤️', 'label'=>'Wishlist',          'desc'=>'Save items for later',                  'target'=>'more',      'soon'=>true],
+                                ['icon'=>'🔥', 'label'=>'Best Sellers',      'desc'=>'Most popular products this week',        'target'=>'home',      'soon'=>false],
+                                ['icon'=>'✨', 'label'=>'New Arrivals',       'desc'=>'Fresh listings from verified sellers',   'target'=>'home',      'soon'=>false],
+                                ['icon'=>'🎁', 'label'=>'Gift Cards',         'desc'=>'Send Merketar credit to a friend',      'target'=>'more',      'soon'=>true],
+                                ['icon'=>'🔍', 'label'=>'Saved Searches',    'desc'=>'Searches you\'ve bookmarked',            'target'=>'more',      'soon'=>true],
+                            ] as $item)
+                            <a href="#{{ $item['target'] }}" data-target="{{ $item['target'] }}"
+                               class="more-card {{ $item['soon'] ? 'more-card-soon' : '' }}">
+                                <div class="more-card-icon">{{ $item['icon'] }}</div>
+                                <div class="more-card-body">
+                                    <div class="more-card-label">{{ $item['label'] }}</div>
+                                    <div class="more-card-desc">{{ $item['desc'] }}</div>
+                                </div>
+                                @if($item['soon'])
+                                    <span class="more-soon-badge">Soon</span>
+                                @else
+                                    <svg class="more-card-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                                    </svg>
+                                @endif
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- ── My Account ───────────────────────────── --}}
+                    <div class="more-group">
+                        <div class="more-group-title">My Account</div>
+                        <div class="more-grid">
+                            @foreach([
+                                ['icon'=>'👤', 'label'=>'Profile & Settings', 'desc'=>'Edit your personal information',         'target'=>'profile',   'soon'=>false],
+                                ['icon'=>'🛍️', 'label'=>'Purchase History',  'desc'=>'Track and review past orders',           'target'=>'purchases', 'soon'=>false],
+                                ['icon'=>'💳', 'label'=>'Wallet & Payments',  'desc'=>'Manage your Merketar balance',           'target'=>'profile',   'soon'=>false],
+                                ['icon'=>'🔔', 'label'=>'Notifications',      'desc'=>'Alerts for orders and promotions',       'target'=>'more',      'soon'=>true],
+                            ] as $item)
+                            <a href="#{{ $item['target'] }}" data-target="{{ $item['target'] }}"
+                               class="more-card {{ $item['soon'] ? 'more-card-soon' : '' }}">
+                                <div class="more-card-icon">{{ $item['icon'] }}</div>
+                                <div class="more-card-body">
+                                    <div class="more-card-label">{{ $item['label'] }}</div>
+                                    <div class="more-card-desc">{{ $item['desc'] }}</div>
+                                </div>
+                                @if($item['soon'])
+                                    <span class="more-soon-badge">Soon</span>
+                                @else
+                                    <svg class="more-card-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                                    </svg>
+                                @endif
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- ── Discover ─────────────────────────────── --}}
+                    <div class="more-group">
+                        <div class="more-group-title">Discover</div>
+                        <div class="more-grid">
+                            @foreach([
+                                ['icon'=>'🎉', 'label'=>'Events & Promos',   'desc'=>'Local market events and campaigns',      'target'=>'more',      'soon'=>true],
+                                ['icon'=>'🤝', 'label'=>'Invite & Earn',     'desc'=>'Earn wallet credit for referrals',       'target'=>'more',      'soon'=>true],
+                                ['icon'=>'📰', 'label'=>'Blog',               'desc'=>'Tips, guides and market news',           'target'=>'more',      'soon'=>true],
+                                ['icon'=>'👥', 'label'=>'Community',          'desc'=>'Connect with buyers and sellers',        'target'=>'more',      'soon'=>true],
+                            ] as $item)
+                            <a href="#{{ $item['target'] }}" data-target="{{ $item['target'] }}"
+                               class="more-card {{ $item['soon'] ? 'more-card-soon' : '' }}">
+                                <div class="more-card-icon">{{ $item['icon'] }}</div>
+                                <div class="more-card-body">
+                                    <div class="more-card-label">{{ $item['label'] }}</div>
+                                    <div class="more-card-desc">{{ $item['desc'] }}</div>
+                                </div>
+                                @if($item['soon'])
+                                    <span class="more-soon-badge">Soon</span>
+                                @else
+                                    <svg class="more-card-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                                    </svg>
+                                @endif
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- ── Support & Legal ─────────────────────── --}}
+                    <div class="more-group">
+                        <div class="more-group-title">Support & Legal</div>
+                        <div class="more-grid">
+                            @foreach([
+                                ['icon'=>'❓', 'label'=>'Help Centre',       'desc'=>'Browse FAQs and common answers',         'target'=>'faq',       'soon'=>false],
+                                ['icon'=>'💬', 'label'=>'Contact Support',   'desc'=>'Get help from the Merketar team',        'target'=>'contact',   'soon'=>false],
+                                ['icon'=>'ℹ️', 'label'=>'About Merketar',   'desc'=>'Our mission, vision and story',          'target'=>'more',      'soon'=>true],
+                                ['icon'=>'📄', 'label'=>'Terms & Privacy',   'desc'=>'Legal documents and policies',           'target'=>'more',      'soon'=>true],
+                            ] as $item)
+                            <a href="#{{ $item['target'] }}" data-target="{{ $item['target'] }}"
+                               class="more-card {{ $item['soon'] ? 'more-card-soon' : '' }}">
+                                <div class="more-card-icon">{{ $item['icon'] }}</div>
+                                <div class="more-card-body">
+                                    <div class="more-card-label">{{ $item['label'] }}</div>
+                                    <div class="more-card-desc">{{ $item['desc'] }}</div>
+                                </div>
+                                @if($item['soon'])
+                                    <span class="more-soon-badge">Soon</span>
+                                @else
+                                    <svg class="more-card-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                                    </svg>
+                                @endif
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                </div>{{-- /more-sections --}}
+
+                {{-- ── Footer strip ────────────────────────────── --}}
+                <div class="more-footer-strip">
+                    <p>©️ {{ date('Y') }} Merketar · Naija Market in Your Pocket</p>
+                    <form action="{{ route('buyer.logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="more-logout-link">Log out</button>
+                    </form>
+                </div>
+
             </div>
         </section>
 
