@@ -71,15 +71,16 @@
     <main class="w-100 main active" style="flex:1;">
 
         {{-- Home Section --}}
-        <section class="section active p-5" id="home">
-            <div class="d-flex flex-column mb-3 gap-1">
+        <section class="section active" id="home">
+            <div class="home-wrap">
 
-                <div id="myCarousel" class="carousel slide mb-1" data-bs-ride="carousel">
+                {{-- ── Carousel ─────────────────────────────────────── --}}
+                <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0"></button>
+                        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
                         <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1"></button>
                         <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2"></button>
-                        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="3" class="active" aria-current="true"></button>
+                        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="3"></button>
                     </div>
                     <div class="carousel-inner rounded-4 overflow-hidden">
                         <div class="carousel-item active">
@@ -88,8 +89,8 @@
                                 <h1>Shop Fresh, Shop Smart</h1>
                                 <p class="sub-cap">Get farm-fresh food and trending products delivered straight to your doorstep.</p>
                                 <p class="sub-cap-btn">
-                                    <a class="btn btn-lg sec-btn-slide" href="#" data-target="market">Browse Categories</a>
-                                    <a class="btn btn-lg pri-btn-slide" href="#" data-target="market">Start Shopping</a>
+                                    <a class="btn btn-lg sec-btn-slide" href="#market" data-target="market">Browse Categories</a>
+                                    <a class="btn btn-lg pri-btn-slide" href="#market" data-target="market">Start Shopping</a>
                                 </p>
                             </div>
                         </div>
@@ -99,8 +100,8 @@
                                 <h1>Buy From Verified Sellers</h1>
                                 <p class="sub-cap">Explore trusted sellers offering quality goods around you.</p>
                                 <p class="sub-cap-btn">
-                                    <a class="btn btn-lg sec-btn-slide" href="#" data-target="market">Find Sellers</a>
-                                    <a class="btn btn-lg pri-btn-slide" href="#" data-target="market">View Map</a>
+                                    <a class="btn btn-lg sec-btn-slide" href="#market" data-target="market">Find Sellers</a>
+                                    <a class="btn btn-lg pri-btn-slide" href="#market" data-target="market">View Map</a>
                                 </p>
                             </div>
                         </div>
@@ -110,8 +111,8 @@
                                 <h1>Safe &amp; Secure Transaction</h1>
                                 <p class="sub-cap">Every purchase is protected with Merketar's secure payment system.</p>
                                 <p class="sub-cap-btn">
-                                    <a class="btn btn-lg sec-btn-slide" href="#" data-target="profile">Checkout Now</a>
-                                    <a class="btn btn-lg pri-btn-slide" href="#" data-target="faq">Learn More</a>
+                                    <a class="btn btn-lg sec-btn-slide" href="#faq" data-target="faq">Learn More</a>
+                                    <a class="btn btn-lg pri-btn-slide" href="#market" data-target="market">Shop Now</a>
                                 </p>
                             </div>
                         </div>
@@ -121,8 +122,8 @@
                                 <h1>Shop, Trade &amp; Connect</h1>
                                 <p class="sub-cap">Be part of a growing community of buyers and sellers making trade easier.</p>
                                 <p class="sub-cap-btn">
-                                    <a class="btn btn-lg sec-btn-slide" href="#" data-target="more">Invite &amp; Earn</a>
-                                    <a class="btn btn-lg pri-btn-slide" href="#" data-target="more">Explore Deals</a>
+                                    <a class="btn btn-lg sec-btn-slide" href="#more" data-target="more">Invite &amp; Earn</a>
+                                    <a class="btn btn-lg pri-btn-slide" href="#more" data-target="more">Explore Deals</a>
                                 </p>
                             </div>
                         </div>
@@ -135,24 +136,142 @@
                     </button>
                 </div>
 
+                {{-- ── News ticker ───────────────────────────────────── --}}
                 <div class="ticker seamless" aria-label="News ticker">
                     <div class="ticker__track">
                         <div class="ticker__group">
-                            <span class="ticker__item">⚡ Breaking: Merketar launches seller features</span>
+                            <span class="ticker__item">⚡ Merketar is live — explore sellers near you</span>
                             <span class="ticker__sep">•</span>
-                            <span class="ticker__item">New arrivals this week</span>
+                            <span class="ticker__item">New arrivals every week</span>
                             <span class="ticker__sep">•</span>
-                            <span class="ticker__item">Free shipping over ₦10,000</span>
+                            <span class="ticker__item">Free delivery on orders over ₦10,000</span>
                             <span class="ticker__sep">•</span>
-                            <span class="ticker__item">⚡ Breaking: Merketar launches seller features</span>
+                            <span class="ticker__item">Verified sellers, secure payments</span>
                             <span class="ticker__sep">•</span>
-                            <span class="ticker__item">New arrivals this week</span>
+                            <span class="ticker__item">⚡ Merketar is live — explore sellers near you</span>
                             <span class="ticker__sep">•</span>
-                            <span class="ticker__item">Free shipping over ₦10,000</span>
+                            <span class="ticker__item">New arrivals every week</span>
+                            <span class="ticker__sep">•</span>
+                            <span class="ticker__item">Free delivery on orders over ₦10,000</span>
+                            <span class="ticker__sep">•</span>
+                            <span class="ticker__item">Verified sellers, secure payments</span>
                             <span class="ticker__sep">•</span>
                         </div>
                     </div>
                 </div>
+
+                {{-- ── Category quick-links ─────────────────────────── --}}
+                <div class="home-block">
+                    <div class="home-cats-scroll">
+                        @php
+                            $cats = [
+                                ['icon'=>'🥦','label'=>'Fresh Food'],
+                                ['icon'=>'👗','label'=>'Fashion'],
+                                ['icon'=>'📱','label'=>'Electronics'],
+                                ['icon'=>'🏠','label'=>'Home & Living'],
+                                ['icon'=>'💊','label'=>'Health & Beauty'],
+                                ['icon'=>'📚','label'=>'Books'],
+                                ['icon'=>'🚗','label'=>'Auto Parts'],
+                                ['icon'=>'🧸','label'=>'Toys & Kids'],
+                                ['icon'=>'⚽','label'=>'Sports'],
+                                ['icon'=>'🐾','label'=>'Pet Supplies'],
+                                ['icon'=>'🛠️','label'=>'Hardware'],
+                                ['icon'=>'🎶','label'=>'Music & Arts'],
+                            ];
+                        @endphp
+                        @foreach($cats as $cat)
+                        <a href="#market" data-target="market" class="home-cat-pill text-decoration-none">
+                            <span class="home-cat-icon">{{ $cat['icon'] }}</span>
+                            <span class="home-cat-label">{{ $cat['label'] }}</span>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- ── Flash deals banner ───────────────────────────── --}}
+                <div class="home-block">
+                    <div class="home-flash-banner">
+                        <div class="home-flash-left">
+                            <span class="home-flash-badge">⚡ Flash Deal</span>
+                            <h3>Up to <strong>40% OFF</strong> on selected stores</h3>
+                            <p>Limited time — grab it before it's gone</p>
+                            <a href="#market" data-target="market" class="home-flash-btn">Shop Now</a>
+                        </div>
+                        <div class="home-flash-right">
+                            <div class="home-flash-label">Ends in</div>
+                            <div class="home-countdown" id="homeCountdown">
+                                <div class="home-cd-block"><span id="cdH">00</span><small>hrs</small></div>
+                                <div class="home-cd-sep">:</div>
+                                <div class="home-cd-block"><span id="cdM">00</span><small>min</small></div>
+                                <div class="home-cd-sep">:</div>
+                                <div class="home-cd-block"><span id="cdS">00</span><small>sec</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ── Nearby sellers ────────────────────────────────── --}}
+                @if($sellers->count())
+                <div class="home-block">
+                    <div class="home-section-head">
+                        <h4>Nearby Sellers</h4>
+                        <a href="#market" data-target="market" class="home-see-all">See all on map →</a>
+                    </div>
+                    <div class="home-sellers-scroll">
+                        @foreach($sellers as $seller)
+                        <div class="home-seller-card">
+                            <div class="home-seller-cover">
+                                <img src="{{ asset('assets/images/default.png') }}" alt="{{ $seller['store_name'] }}">
+                            </div>
+                            <div class="home-seller-info">
+                                <div class="home-seller-name">{{ $seller['store_name'] }}</div>
+                                @if($seller['address'])
+                                <div class="home-seller-addr">📍 {{ Str::limit($seller['address'], 32) }}</div>
+                                @endif
+                                <a href="#market" data-target="market" class="home-seller-visit">Visit Store</a>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                {{-- ── Trending products ────────────────────────────── --}}
+                <div class="home-block">
+                    <div class="home-section-head">
+                        <h4>Trending Products</h4>
+                        <a href="#market" data-target="market" class="home-see-all">Browse all →</a>
+                    </div>
+                    @if($trendingProducts->count())
+                    <div class="home-products-grid">
+                        @foreach($trendingProducts as $product)
+                        @php
+                            $thumb = $product->images->first()->image_url
+                                ?? ($product->picture !== 'defaultL.jpg' ? $product->picture : null);
+                        @endphp
+                        <div class="home-product-card">
+                            <div class="home-product-img">
+                                @if($thumb)
+                                    <img src="{{ asset('uploads/products/picture/' . $thumb) }}" alt="{{ $product->name }}"
+                                         onerror="this.src='{{ asset('assets/images/default.png') }}'">
+                                @else
+                                    <img src="{{ asset('assets/images/default.png') }}" alt="{{ $product->name }}">
+                                @endif
+                            </div>
+                            <div class="home-product-body">
+                                <div class="home-product-name">{{ Str::limit($product->name, 30) }}</div>
+                                <div class="home-product-store">{{ $product->store->store_name ?? '' }}</div>
+                                <div class="home-product-price">₦{{ number_format($product->price) }}</div>
+                                <button class="home-product-btn" data-target="market">View in Store</button>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <p class="text-muted text-center py-4">No products listed yet — check back soon.</p>
+                    @endif
+                </div>
+
             </div>
         </section>
 
@@ -401,5 +520,45 @@
         </div>
         <p class="w-100 text-center mt-0 mb-0" style="font-size:9px;color:#6c757d;">©️ 2025 Merketar. Naija Market in Your Pocket.</p>
     </footer>
+
+@push('scripts')
+<script>
+// ── Flash-deal countdown (resets every 24 h) ─────────────────
+(function () {
+    const now   = new Date();
+    const end   = new Date(now);
+    end.setHours(23, 59, 59, 999);          // counts to midnight each day
+
+    function tick() {
+        const diff = Math.max(0, end - Date.now());
+        const h  = Math.floor(diff / 3600000);
+        const m  = Math.floor((diff % 3600000) / 60000);
+        const s  = Math.floor((diff % 60000)   / 1000);
+        const pad = n => String(n).padStart(2, '0');
+        const cdH = document.getElementById('cdH');
+        const cdM = document.getElementById('cdM');
+        const cdS = document.getElementById('cdS');
+        if (cdH) cdH.textContent = pad(h);
+        if (cdM) cdM.textContent = pad(m);
+        if (cdS) cdS.textContent = pad(s);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+})();
+
+// ── "View in Store" product buttons → go to market section ───
+document.querySelectorAll('.home-product-btn[data-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        if (!target) return;
+        document.querySelectorAll('.section.active').forEach(s => s.classList.remove('active'));
+        target.classList.add('active');
+        sessionStorage.setItem('activeSection', targetId);
+    });
+});
+</script>
+@endpush
 
 @endsection

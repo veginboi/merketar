@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MerketarAccount;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Store;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
@@ -32,6 +33,12 @@ class BuyerController extends Controller
                 'picture'     => $s->profile_picture,
             ]);
 
+        $trendingProducts = Product::with(['images', 'store'])
+            ->whereHas('store', fn($q) => $q->where('store_status', 'active'))
+            ->latest()
+            ->take(12)
+            ->get();
+
         $recentOrders = Order::with(['store', 'items.product'])
             ->where('buyer_id', $user->id)
             ->latest()
@@ -43,7 +50,7 @@ class BuyerController extends Controller
             ->latest()
             ->get();
 
-        return view('buyer.index', compact('user', 'profile', 'account', 'sellers', 'recentOrders', 'allOrders'));
+        return view('buyer.index', compact('user', 'profile', 'account', 'sellers', 'trendingProducts', 'recentOrders', 'allOrders'));
     }
 
     public function uploadProfilePicture(Request $request)
